@@ -4,7 +4,10 @@
 
 El adecuado manejo de excepciones en una aplicación es muy importante. Se trata entonces de registrar la excepción relacionada al problema ocurrido en el lugar exacto. 
 
-Algunas veces al intentar manejar las excepciones terminamos registrando la misma excepción mas de una vez, resultando en logs de excepciones difíciles de leer. El objetivo de este artículo es mostrar una estrategia de manejo de excepciones basada en políticas además del registro de esas excepciones en un componente de _Application Insights_
+Algunas veces al intentar manejar las excepciones terminamos registrando la misma excepción mas de una vez, resultando en logs de excepciones difíciles de leer. 
+
+El objetivo de este artículo es mostrar una estrategia de manejo de excepciones basada en políticas además del registro de esas excepciones en un componente de _Application Insights_
+
 ---
 
 ## Implementación de la solución
