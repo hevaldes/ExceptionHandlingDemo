@@ -12,7 +12,7 @@ El objetivo de este artículo es mostrar una estrategia de manejo de excepciones
 
 ## Implementación de la solución
 
-### Creación del componente de _Application Insights_
+### Implementación del componente de _Application Insights_
 
 #### ¿Qué es Application Insights?
 
@@ -252,7 +252,7 @@ Crearemos ahora el componente para manejo de excepciones basado en políticas.
 
 Este tipo de estrategia estará utilizando el concepto de una política para registrar o no la excepción. Veremos en la implementación que si queremos registrar lo ocurrido en la capa de datos por ejemplo, registraremos la excepción normalmente, pero el flujo de ejecución al regresar a la capa superior se evaluará la política aplicada previamente y de ameritarlo, registrará la excepción o de lo contrario solo se propagará. 
 
-#### Configuración de Visual Studio para leer NuGet's publicados. 
+#### Configuración de Visual Studio para leer NuGet publicados. 
 
 1. Ir al proyecto de _Azure DevOps_
 2. Seleccionar _Artifacts_
@@ -281,7 +281,6 @@ Este tipo de estrategia estará utilizando el concepto de una política para reg
 
 13. Presionar _Update_
 14. Presionar _OK_
-
 
 #### Configuración del componente de _Exception Handling_
 
@@ -484,7 +483,6 @@ Agregar las siguientes referencias
 using ExceptionHandlingAplicativos.ExceptionTypes;
 using System.Configuration;
 using TelemetriaAplicativos;
-
 ```
 
 Implemente la clase como sigue: 
@@ -529,7 +527,6 @@ Agregar las siguientes referencias
 using ExceptionHandlingAplicativos.ExceptionTypes;
 using System.Configuration;
 using TelemetriaAplicativos;
-
 ```
 Implemente la clase como sigue: 
 
@@ -600,7 +597,7 @@ Implemente la clase como sigue:
                 }
                 else
                 {
-                    //Registramos excepsión bajo la política de UserInterfacePolicy
+                    //Registramos excepción bajo la política de UserInterfacePolicy
                     rethrow = t.RegistraExcepcion(ex, customDimensions, "UserInterfacePolicy");
                 }
             }
@@ -639,3 +636,132 @@ Resultando:
 
 ![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/NugetPushResultEx.PNG "Azure DevOps Artifacts")
 
+2. En Azure DevOps Artifact se verá como sigue: 
+
+![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/NugetPublished2.PNG "Azure DevOps Artifacts")
+
+---
+
+#### Resumen
+
+* Se ha creado un componente para manejar las excepciones de la aplicación. Este componente utiliza un paquete NuGet de Telemetría.
+* Este componente al ser un paquete puede ser referenciado por cualquier otro proyecto dentro de la organización. Así iniciar un manejo centralizado de excepciones. 
+* El paquete está listo, mas adelante cuando desarrollemos el cliente de prueba haremos la configuración final.
+
+Ya casi terminamos, solo falta crear un cliente para probar todo. 
+
+---
+
+### Implementación del Cliente de Pruebas
+
+Esta implementación será crear un cliente que simule tener ejecución en capa de presentación, negocio y datos. Provocaremos errores en las 3 capas y veremos funcionando la política de excepciones + componente de telemetría. 
+
+
+1. Agregar un proyecto nuevo a la solución _slnDemoExceptionHandling_ que se llame _TestClient_. Puede ser una aplicación de consola en .NET Core. 
+
+![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/TestClient.PNG "Azure DevOps Artifacts")
+
+2. Dar clic derecho al proyecto _TestClient_ y agregar la referencia al paquete _NuGet_ de _ExceptionHandlingAplicativos_
+
+![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/RefException.PNG "Azure DevOps Artifacts")
+
+3. Instalar la referencia a _ExceptionHandlingAplicativos_
+
+4. Agregar la siguiente referencia al inicia del archivo _Program.cs_
+
+```
+using System.Collections.Generic;
+using ExceptionHandlingAplicativos.ExceptionHandlers;
+using System.Data.SqlClient;
+using System.IO;
+```
+
+Implementar el resto de la clase _Program_ como sigue: 
+
+```
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Dictionary<string, string> cDimensions = new Dictionary<string, string>();
+            try
+            {
+                //Ejecución en la capa de UI
+              
+                //int x = 100;
+                //int z = 0;
+                //cDimensions.Add("Numero A", x.ToString());
+                //cDimensions.Add("Numero B", z.ToString());
+                //int w = x / z;
+
+                //Navega a la capa de negocio
+                CapaBusiness();
+            }
+            catch (Exception e)
+            {
+                //Agregar información de valor del contexto UI
+                UserInterfaceExceptionHandler.HandleException(ref e, cDimensions);
+                Console.WriteLine(e.Message);
+            }
+            Console.WriteLine("Programa Terminado");
+            Console.ReadLine();
+        }
+
+        static void CapaBusiness()
+        {
+            Dictionary<string, string> cDimensions = new Dictionary<string, string>();
+            try
+            {
+                //Ejecución capa de negocio
+                //string fileName = @"x:\demo.txt";
+                //cDimensions.Add("Archivo buscado", fileName);
+                //File.Open($"{fileName}", FileMode.Open);
+
+                //Navega a capa de datos
+                CapaData();
+            }
+            catch (Exception e)
+            {
+                //Agregar información de valor del contexto de negocio
+                BusinessLogicExceptionHandler.HandleException(ref e, cDimensions);
+                Console.WriteLine(e.Message);
+            }
+        }
+
+        static void CapaData()
+        {
+            Dictionary<string, string> cDimensions = new Dictionary<string, string>();
+            try
+            {
+                string strCN = "myConnectionString";
+                cDimensions.Add("Cadena de conexión", strCN);
+                SqlConnection cn = new SqlConnection("myCadenaConexion");
+                cn.Open();
+            }
+            catch (Exception e)
+            {
+                //Agregar información de valor del contexto de datos
+                DataAccessExceptionHandler.HandleException(ref e, cDimensions);
+                Console.WriteLine(e.Message);
+            }
+        }
+    }
+```
+
+5. Finalmente, agregue a su proyecto de pruebas un archivo llamado App.config con el contenido de la llave de Application Insights.
+
+```
+<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+	<appSettings>
+		<add key="InstrumentationKey" value="[INSTRUMENTATIONKEY]"/>
+	</appSettings>
+</configuration>
+```
+
+6. Compilar
+7. Establecer el proyecto de pruebas como proyecto de inicio y provocar los diferentes errores. 
+8. Al depurar se podrá ver aplicada la política de manejo de excepciones junto con la telemetría. 
+9. Al finalizar la depuración simulando las 3 capas, se podrá ver en el _Application Insights_ la siguiente información.
+
+![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/EvidenciaAppIns.PNG "Azure DevOps Artifacts")

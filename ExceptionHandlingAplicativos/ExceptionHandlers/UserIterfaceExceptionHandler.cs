@@ -25,7 +25,7 @@ namespace ExceptionHandlingAplicativos.ExceptionHandlers
                 }
                 else
                 {
-                    //Registramos excepsión bajo la política de UserInterfacePolicy
+                    //Registramos excepción bajo la política de UserInterfacePolicy
                     rethrow = t.RegistraExcepcion(ex, customDimensions, "UserInterfacePolicy");
                 }
             }
