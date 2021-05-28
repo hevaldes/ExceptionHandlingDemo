@@ -22,7 +22,7 @@ Instale un paquete de instrumentación pequeño (SDK) en la aplicación o habili
 
 No solo puede instrumentar la aplicación de servicio web, sino también todos los componentes en segundo plano y JavaScript en las propias páginas web. La aplicación y sus componentes se pueden ejecutar en cualquier lugar; no tienen que estar hospedados en Azure.
 
-![Image](https://github.com/hevaldes/ExceptionHandlingDemo/blob/master/assets/ApplicationInsightsDiagram.gif "Microsoft Applicaition Insights")
+![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/ApplicationInsightsDiagram.gif "Microsoft Applicaition Insights")
 
 [Referencia Application Insights](https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview#how-does-application-insights-work "Referencia Application Insights")
 
@@ -38,31 +38,31 @@ Para esto, se recomienda seguir el siguiente artículo en Microsoft Docs
 
 El resultado debería ser algo similar a la siguiente imágen:
 
-![Image](https://github.com/hevaldes/ExceptionHandlingDemo/blob/master/assets/AppIns.PNG "Application Insights")
+![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/AppIns.PNG "Application Insights")
 
 #### Creación del _Feed_ en _Artifacts_ de _Azure DevOps_
 
 1. En el portal de _Azure DevOps_ dar clic en la sección de _Artifacts_ dentro de algún proyecto. 
 
-![Image](https://github.com/hevaldes/ExceptionHandlingDemo/blob/master/assets/AzDOProject.PNG "Azure DevOps")
+![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/AzDOProject.PNG "Azure DevOps")
 
 2. Dar clic en _Create Feed_
 
-![Image](https://github.com/hevaldes/ExceptionHandlingDemo/blob/master/assets/ArtifactsCreateFeed.PNG "Azure DevOps")
+![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/ArtifactsCreateFeed.PNG "Azure DevOps")
 
 3. Dar un nombre a este nuevo _Feed_. El nombre puede ser _FeedDemo_
 
-![Image](https://github.com/hevaldes/ExceptionHandlingDemo/blob/master/assets/CreateFeedDiagBox.PNG "Azure DevOps")
+![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/CreateFeedDiagBox.PNG "Azure DevOps")
 
 4. El resultado será: 
 
-![Image](https://github.com/hevaldes/ExceptionHandlingDemo/blob/master/assets/FeedCreado.PNG "Azure DevOps")
+![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/FeedCreado.PNG "Azure DevOps")
 
 5. Presionar el botón _Connect to Feed_
 6. Seleccionar _dotnet_
 7. Mantener esta página abierta ya que se requerirá mas adelante. 
 
-![Image](https://github.com/hevaldes/ExceptionHandlingDemo/blob/master/assets/FeedConnect.PNG "Azure DevOps")
+![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/FeedConnect.PNG "Azure DevOps")
 
 #### Creación del componente de telemetría de Application Insights
 
@@ -70,7 +70,7 @@ En este caso, esta implementación refiere a crear un paquete NuGet. Este paquet
 
 1. Crearemos una solución en blanco en Visual Studio llamada _slnDemoExceptionHandling_
 
-![Image](https://github.com/hevaldes/ExceptionHandlingDemo/blob/master/assets/Solution.gif "Visual Studio Solution")
+![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/Solution.gif "Visual Studio Solution")
 
 2. A esta solución agregaremos un proyecto de tipo _Class Library / .NET Standard_ que le llamaremos _TelemetriaAplicativos_
 
@@ -78,7 +78,7 @@ En este caso, esta implementación refiere a crear un paquete NuGet. Este paquet
 
 3. Agregar al proyecto un archivo llamado _nuget.config_
 
-![Image](https://github.com/hevaldes/ExceptionHandlingDemo/blob/master/assets/NugetConfig.PNG "Visual Studio Solution")
+![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/NugetConfig.PNG "Visual Studio Solution")
 
 4. Del portal de _Azure DevOps_ copiar el _XML_ en el archivo creado. 
 
@@ -94,7 +94,7 @@ En este caso, esta implementación refiere a crear un paquete NuGet. Este paquet
 
 Quedando de la siguiente forma: 
 
-![Image](https://github.com/hevaldes/ExceptionHandlingDemo/blob/master/assets/NugetConfig2.PNG "Visual Studio Solution")
+![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/NugetConfig2.PNG "Visual Studio Solution")
 
 5. Es tiempo de complementar el componente de telemetría. 
 
@@ -200,7 +200,7 @@ Quedando de la siguiente forma:
 
 9. Resuelva la dependencia de la línea donde está el objeto _TelemetryClient_
 
-![Image](https://github.com/hevaldes/ExceptionHandlingDemo/blob/master/assets/TelemetryClient.PNG "Visual Studio Solution")
+![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/TelemetryClient.PNG "Visual Studio Solution")
 
 10. Agregue la siguiente referencia al inicio de su archivo _Telemetria.cs_
 
@@ -211,11 +211,11 @@ using Microsoft.ApplicationInsights.Extensibility;
 11. Clic derecho al proyecto, seleccionar _Properties_
 12. En la sección de _Package_ seleccionar _Generate NuGet package in build_
 
-![Image](https://github.com/hevaldes/ExceptionHandlingDemo/blob/master/assets/NugetProperties.PNG "Visual Studio Solution")
+![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/NugetProperties.PNG "Visual Studio Solution")
 
 13. Compilar el programa, debe hacerse sin errores. Debe generar un archivo llamado _TelemetriaAplicativos.1.0.0.nupkg_ 
 
-![Image](https://github.com/hevaldes/ExceptionHandlingDemo/blob/master/assets/PaqueteNuGet.PNG "Visual Studio Solution")
+![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/PaqueteNuGet.PNG "Visual Studio Solution")
 
 ---
 
@@ -230,12 +230,12 @@ Los parámetros solicitados son:
 ```
 nuget push -Source FeedDemo -ApiKey az [_PackagePath_]
 ```
-![Image](https://github.com/hevaldes/ExceptionHandlingDemo/blob/master/assets/NugetPush.PNG "Azure DevOps Artifacts")
+![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/NugetPush.PNG "Azure DevOps Artifacts")
 
 2. El resultado de esta ejecución será: 
 
-![Image](https://github.com/hevaldes/ExceptionHandlingDemo/blob/master/assets/NugetPushResult.PNG "Azure DevOps Artifacts")
+![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/NugetPushResult.PNG "Azure DevOps Artifacts")
 
 3. Al regresar al portal de Azure DevOps a la sección de _Artifacts_, ya se podrá ver el paquete agregado.  
 
-![Image](https://github.com/hevaldes/ExceptionHandlingDemo/blob/master/assets/NugetPublished.PNG "Azure DevOps Artifacts")
+![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/NugetPublished.PNG "Azure DevOps Artifacts")
