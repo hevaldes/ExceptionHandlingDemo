@@ -194,6 +194,7 @@ Quedando de la siguiente forma:
         }
     }
 ```
+Nota: El método RegistraExcepcion registra el error en _Application Insights_ solamente cuando la política es diferente a _PassThroughPolicy_. El hecho de solicitar el manejo de una excepción bajo la política _PassThroughPolicy_ solo significa que se dará por "procesada" la excepción sin registrarla, esto debido a que pudo ser registrada antes.  
 
 9. Resuelva la dependencia de la línea donde está el objeto _TelemetryClient_
 
@@ -225,7 +226,7 @@ Los parámetros solicitados son:
 * -Source: Se obtiene del portal de Azure DevOps o bien desde el archivo nuget.config, en este caso es: _StdrPocAzDO_
 
 ```
-nuget push -Source FeedDemo -ApiKey az [_PackagePath_]
+nuget push -Source FeedDemo -ApiKey az .\TelemetriaAplicativos.1.0.0.nupkg
 ```
 ![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/NugetPush.PNG "Azure DevOps Artifacts")
 
@@ -245,7 +246,7 @@ nuget push -Source FeedDemo -ApiKey az [_PackagePath_]
 
 ---
 
-### Implementación del _Exception Handling_
+### Implementación del componente de _Exception Handling_
 
 Crearemos ahora el componente para manejo de excepciones basado en políticas. 
 
@@ -253,7 +254,7 @@ Este tipo de estrategia estará utilizando el concepto de una política para reg
 
 #### Configuración de Visual Studio para leer NuGet's publicados. 
 
-1. Ir al proyecto de_ Azure DevOps_
+1. Ir al proyecto de _Azure DevOps_
 2. Seleccionar _Artifacts_
 3. Seleccionar el _Feed_ que hemos creado llamado _FeedDemo_
 4. Seleccionar en la parte superior la opción _Connect to feed_
@@ -307,7 +308,7 @@ Este tipo de estrategia estará utilizando el concepto de una política para reg
 ![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/PackageSources3.PNG "Visual Studio Solution")
 
 10. Seleccionar el paquete de TelemetriaAplicativos
-11. Clic en Install
+11. Clic en _Install_
 
 ![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/InstallTelemetry.PNG "Visual Studio Solution")
 
@@ -318,5 +319,323 @@ Este tipo de estrategia estará utilizando el concepto de una política para reg
 #### Implementación del componente de _Exception Handling_
 
 Ya que tenemos configurado el proyecto, procederemos a la implementación. Esta implementación estará dividida en 2 partes: 
-* ExceptionTypes
-* ExceptionHandlers
+* _ExceptionTypes_
+* _ExceptionHandlers_
+
+ Esto puede variar de implementación a implementación, solo úsese como una guía. 
+
+##### ExceptionTypes
+
+En esta sección crearemos nuestras excepciones personalizadas las cuales nos darán un mejor manejo de cualquier error que pudiese ocurrir. 
+
+1. Iniciamos creando una clase llamada _BaseException.cs_. Esta será la excepción base del resto. 
+
+```
+    public class BaseException : System.Exception, ISerializable
+    {
+        public BaseException()
+           : base()
+        {
+            // Agregar implementación si fuera requerida
+        }
+
+        public BaseException(string message)
+           : base(message)
+        {
+            // Agregar implementación si fuera requerida
+        }
+
+        public BaseException(string message, System.Exception inner)
+           : base(message, inner)
+        {
+            // Agregar implementación si fuera requerida
+        }
+
+        protected BaseException(SerializationInfo info, StreamingContext context)
+           : base(info, context)
+        {
+            // Agregar implementación si fuera requerida
+        }
+    }
+```
+
+ 2. Ahora crearemos una excepción para cuando ocurran errores en la capa de negocio. Esta excepción heredará de _BaseException_. Este archivo se llamará _BusinessLogicException.cs_
+
+```
+    public class BusinessLogicException : BaseException, ISerializable
+    {
+        public BusinessLogicException()
+           : base()
+        {
+            // Agregar implementación si fuera requerida
+        }
+
+        public BusinessLogicException(string message)
+           : base(message)
+        {
+            // Agregar implementación si fuera requerida
+        }
+
+        public BusinessLogicException(string message, System.Exception inner)
+           : base(message, inner)
+        {
+            // Agregar implementación si fuera requerida
+        }
+
+        protected BusinessLogicException(SerializationInfo info, StreamingContext context)
+           : base(info, context)
+        {
+            // Agregar implementación si fuera requerida
+        }
+    }
+```
+
+3. Ahora crearemos una excepción para cuando ocurran errores en la capa de datos. Esta excepción heredará de _BaseException_. Este archivo se llamará _DataAccessException.cs_
+
+```
+    public class DataAccessException : BaseException, ISerializable
+    {
+        public DataAccessException()
+           : base()
+        {
+            // Agregar implementación si fuera requerida
+        }
+
+        public DataAccessException(string message)
+           : base(message)
+        {
+            // Add implemenation (if required)
+        }
+
+        public DataAccessException(string message, System.Exception inner)
+           : base(message, inner)
+        {
+            // Agregar implementación si fuera requerida
+        }
+
+        protected DataAccessException(SerializationInfo info, StreamingContext context)
+           : base(info, context)
+        {
+            // Agregar implementación si fuera requerida
+        }
+    }
+```
+
+3. Finalmente crearemos una excepción para cuando no se necesite registrar la excepción, es decir que solo se propague. Esta excepción heredará de _BaseException_. Este archivo se llamará _PassThroughException.cs_
+
+```
+    public class PassThroughException : BaseException, ISerializable
+    {
+        public PassThroughException()
+           : base()
+        {
+            // Agregar implementación si fuera requerida
+        }
+
+        public PassThroughException(string message)
+           : base(message)
+        {
+            // Agregar implementación si fuera requerida
+        }
+
+        public PassThroughException(string message, System.Exception inner)
+           : base(message, inner)
+        {
+            // Agregar implementación si fuera requerida
+        }
+
+        protected PassThroughException(SerializationInfo info, StreamingContext context)
+           : base(info, context)
+        {
+            // Agregar implementación si fuera requerida
+        }
+    }
+```
+
+4. Agregue a las 4 clases creadas la siguiente referencia
+```
+using System.Runtime.Serialization;
+```
+
+5. Compilar el proyecto, no debería marcar ningún error quedando de la siguiente forma: 
+
+![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/ExTypes.PNG "Visual Studio Solution")
+
+##### ExceptionHandlers
+
+Ahora, en esta sección crearemos los manejadores de excepciones basados en los _Exceptiontype_s que acabamos de generar. 
+
+1. Dentro del folder _ExceptionHandlers_ agregaremos los siguientes archivos: 
+* Clase llamada: _BusinessLogicExceptionHandler.cs_
+* Clase llamada: _DataAccessExceptionHandler.cs_
+* Clase llamada: _UserInterfaceExceptionHandler.cs_
+
+![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/ExHdlr.PNG "Visual Studio Solution")
+
+2. Implementemos el manejador de errores referente a la capa de datos _DataAccessExceptionHandler.cs_.
+
+* En este escenario SIEMPRE registraremos la excepción ya que es la capa mas baja que tenemos. 
+* Nótese como se solicita un manejo de excepción con una poítica _DataAccessPolicy_. Esto significa que que se manejará la excepción y se enviará al Application Insights. 
+* Si la política hubiese sido _PassThroughPolicy_, el manejador marca como procesada la excepción, pero no la hubiera enviado a _Application Insights_
+
+Agregar las siguientes referencias
+
+```
+using ExceptionHandlingAplicativos.ExceptionTypes;
+using System.Configuration;
+using TelemetriaAplicativos;
+
+```
+
+Implemente la clase como sigue: 
+
+```
+    public static class DataAccessExceptionHandler
+    {
+        public static bool HandleException(ref Exception ex, Dictionary<string, string> customDimensions)
+        {
+            //Inicializa el cliente de Telemetría de Application Insights. Nos referermos al NuGet de TelemetriaAplicativos
+            Telemetria t = new Telemetria(ConfigurationManager.AppSettings["InstrumentationKey"]);
+
+            //Esta variable nos servirá para indicar si propagamos la excepción hacia las capas superiores.
+            bool rethrow;
+
+            //Este es el método principal de registro de telemetría. 
+            rethrow = t.RegistraExcepcion(ex, customDimensions, "DataAccessPolicy");
+            
+            //En este punto la excepción ya fué registrada. 
+            //Podemos esconder el error real y enmascarar con una nueva excepción cuidando así, la información mostrada en capas superiores
+            //La nueva excepción es de tipo DataAccessException
+            ex = new DataAccessException("DAL: Error de sistema, intente mas tarde.");
+
+            //Entonces, si se manejó la excepción, independientemente de la política, la excepción se propaga.
+            //En este caso es una excepción nueva sin información sensible de la base de datos. 
+            if (rethrow)
+                throw ex;
+
+            return rethrow;
+        }
+    }
+```
+3. Implementemos el manejador de errores referente a la capa de negocio llamado _BusinessLogicExceptionHandler.cs_.
+
+* En este escenario SIEMPRE registraremos la excepción que suceda en la capa de negocio, mas no la que ya fué registrada en la capa de datos. 
+* Dentro del método se evalúa si la excepción viene de la base de datos, si fuera así la excepción sería: _DataAccessException_. Si fuera este caso, el código entiende que ya se ha registrado esta excepción y se manda una política de  _PassThroughPolicy_
+* En caso contrario, se evalúa que la excepcíon ocurrida no viene de la base de datos, por lo que se manda una política llamada _BusinessLogicPolicy_. Esto indica que el componente de telemetría debe registrar la excepción.
+
+Agregar las siguientes referencias
+
+```
+using ExceptionHandlingAplicativos.ExceptionTypes;
+using System.Configuration;
+using TelemetriaAplicativos;
+
+```
+Implemente la clase como sigue: 
+
+```
+    public static class BusinessLogicExceptionHandler
+    {
+        public static bool HandleException(ref Exception ex, Dictionary<string, string> customDimensions)
+        {
+            //Inicializa el cliente de Telemetría de Application Insights. Nos referermos al NuGet de TelemetriaAplicativos
+            Telemetria t = new Telemetria(ConfigurationManager.AppSettings["InstrumentationKey"]);
+
+            //Esta variable nos servirá para indicar si propagamos la excepción hacia las capas superiores.
+            bool rethrow;
+
+            //Si es una excepción ocurrida en la base de datos, es decir que venga desde esa capa en teoría ya está registrada. 
+            //Por ello, mandamos una política de PassThroughPolicy
+            if (ex is DataAccessException)
+            {
+                rethrow = t.RegistraExcepcion(ex, customDimensions, "PassThroughPolicy");
+                ex = new PassThroughException(ex.Message);
+            }
+            //Si la excepción no ocurró en base de datos, entonces significa que ocurrió en la capa de negocio. 
+            //Por ello se usa una política BusinessLogicPolicy y se enmascara el error de negocio. 
+            else
+            {
+                rethrow = t.RegistraExcepcion(ex, customDimensions, "BusinessLogicPolicy");
+                ex = new BusinessLogicException("BUS: Error de sistema, intente mas tarde.");
+            }
+
+            //Entonces, si se manejó la excepción, independientemente de la política, la excepción se propaga.
+            //En este caso es una excepción nueva sin información sensible de la base de datos. 
+            if (rethrow)
+                throw ex;
+
+            return rethrow;
+        }
+    }
+```
+
+4. Ya tenemos manejador para Datos y Negocio. Falta implementar cuando ocurra un error en la capa de presentación. 
+
+Agregar las siguientes referencias
+
+```
+using ExceptionHandlingAplicativos.ExceptionTypes;
+using System.Configuration;
+using TelemetriaAplicativos;
+```
+
+Implemente la clase como sigue: 
+
+```
+    public static class UserInterfaceExceptionHandler
+    {
+        public static bool HandleException(ref Exception ex, Dictionary<string, string> customDimensions)
+        {
+            //Inicializa el cliente de Telemetría de Application Insights. Nos referermos al NuGet de TelemetriaAplicativos
+            Telemetria t = new Telemetria(ConfigurationManager.AppSettings["InstrumentationKey"]);
+
+            //Esta variable nos servirá para indicar si propagamos la excepción hacia las capas superiores.
+            bool rethrow = false;
+            try
+            {
+                if (ex is BaseException)
+                {
+                    rethrow = t.RegistraExcepcion(ex, customDimensions, "PassThroughPolicy");
+                    //O bien no hacer nada debido a que la excepción fué registrada ya.
+                }
+                else
+                {
+                    //Registramos excepsión bajo la política de UserInterfacePolicy
+                    rethrow = t.RegistraExcepcion(ex, customDimensions, "UserInterfacePolicy");
+                }
+            }
+            catch
+            {
+                //Si falla el manejo de excepciones, estamos perdidos. :(
+            }
+            return rethrow;
+        }
+    }
+```
+
+---
+
+#### Configuración para empaquetar el componente ExceptionHandlingAplicativos 
+
+1. Clic derecho al proyecto, seleccionar _Properties_
+2. En la sección de _Package_ seleccionar _Generate NuGet package in build_
+3. Compilar el programa, debe hacerse sin errores. Debe generar un archivo llamado _ExceptionHandlingAplicativos.1.0.0.nupkg_ 
+
+#### Publicación del componente de manejo de excepcionesen Azure DevOps Artifacts
+
+1. Desde una ventana de comando, ejecutar el siguiente comando referenciando al paquete llamado _TelemetriaAplicativos.1.0.0.nupkg_ 
+
+Los parámetros solicitados son: 
+
+* -Source: Se obtiene del portal de Azure DevOps o bien desde el archivo nuget.config, en este caso es: _StdrPocAzDO_
+
+```
+nuget push -Source FeedDemo -ApiKey az .\ExceptionHandlingAplicativos.1.0.0.nupkg
+```
+
+![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/NugetPushEx.PNG "Azure DevOps Artifacts")
+
+Resultando: 
+
+![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/NugetPushResultEx.PNG "Azure DevOps Artifacts")
+
