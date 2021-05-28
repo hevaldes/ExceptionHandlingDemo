@@ -4,9 +4,7 @@
 
 El adecuado manejo de excepciones en una aplicación es muy importante. Se trata entonces de registrar la excepción relacionada al problema ocurrido en el lugar exacto. 
 
-Algunas veces al intentar manejar las excepciones terminamos registrando la misma excepción mas de una vez, resultando en logs de excepciones difíciles de leer.
-
-El objetivo de este artículo es mostrar una estrategia de manejo de excepciones basada en políticas además del registro de esas excepciones en un componente de _Application Insights_
+Algunas veces al intentar manejar las excepciones terminamos registrando la misma excepción mas de una vez, resultando en logs de excepciones difíciles de leer. El objetivo de este artículo es mostrar una estrategia de manejo de excepciones basada en políticas además del registro de esas excepciones en un componente de _Application Insights_
 ---
 
 ## Implementación de la solución
@@ -54,13 +52,9 @@ El resultado debería ser algo similar a la siguiente imágen:
 
 ![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/CreateFeedDiagBox.PNG "Azure DevOps")
 
-4. El resultado será: 
-
-![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/FeedCreado.PNG "Azure DevOps")
-
-5. Presionar el botón _Connect to Feed_
-6. Seleccionar _dotnet_
-7. Mantener esta página abierta ya que se requerirá mas adelante. 
+4. Presionar el botón _Connect to Feed_
+5. Seleccionar _dotnet_
+6. Mantener esta página abierta ya que se requerirá mas adelante. 
 
 ![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/FeedConnect.PNG "Azure DevOps")
 
@@ -70,7 +64,7 @@ En este caso, esta implementación refiere a crear un paquete NuGet. Este paquet
 
 1. Crearemos una solución en blanco en Visual Studio llamada _slnDemoExceptionHandling_
 
-![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/Solution.gif "Visual Studio Solution")
+![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/Solution.PNG "Visual Studio Solution")
 
 2. A esta solución agregaremos un proyecto de tipo _Class Library / .NET Standard_ que le llamaremos _TelemetriaAplicativos_
 
@@ -200,7 +194,7 @@ Quedando de la siguiente forma:
 
 9. Resuelva la dependencia de la línea donde está el objeto _TelemetryClient_
 
-![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/TelemetryClient.PNG "Visual Studio Solution")
+![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/TelemetryClient.png "Visual Studio Solution")
 
 10. Agregue la siguiente referencia al inicio de su archivo _Telemetria.cs_
 
@@ -239,3 +233,13 @@ nuget push -Source FeedDemo -ApiKey az [_PackagePath_]
 3. Al regresar al portal de Azure DevOps a la sección de _Artifacts_, ya se podrá ver el paquete agregado.  
 
 ![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/NugetPublished.PNG "Azure DevOps Artifacts")
+
+#### Resumen 
+
+* Se ha creado un componente para almacenar la telemetría de la aplicación. Esta telemetría pueden ser eventos personalizados y bien errores. 
+* Este componente al ser un paquete puede ser referenciado por cualquier otro proyecto dentro de la organización. 
+* El paquete está listo, mas adelante cuando desarrollemos el cliente de prueba haremos la configuración final.
+
+---
+### Creación del componente de _Exception Handling_
+
