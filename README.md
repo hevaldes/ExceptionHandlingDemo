@@ -32,9 +32,9 @@ Lo primero que haremos será crear un recurso de _Microsoft Application Insights
 
 Para esto, se recomienda seguir el siguiente artículo en Microsoft Docs
 
-[1. Sign in to Microsoft Azure](https://docs.microsoft.com/en-us/azure/azure-monitor/app/create-new-resource#sign-in-to-microsoft-azure "Sign in to Microsoft Azure")
-[2. Create an Application Insights resource](https://docs.microsoft.com/en-us/azure/azure-monitor/app/create-new-resource#sign-in-to-microsoft-azure "Create an Application Insights resource")
-[3. Copy the instrumentation key](https://docs.microsoft.com/en-us/azure/azure-monitor/app/create-new-resource#copy-the-instrumentation-key "Copy the instrumentation key")
+* [1. Sign in to Microsoft Azure](https://docs.microsoft.com/en-us/azure/azure-monitor/app/create-new-resource#sign-in-to-microsoft-azure "Sign in to Microsoft Azure")
+* [2. Create an Application Insights resource](https://docs.microsoft.com/en-us/azure/azure-monitor/app/create-new-resource#sign-in-to-microsoft-azure "Create an Application Insights resource")
+* [3. Copy the instrumentation key](https://docs.microsoft.com/en-us/azure/azure-monitor/app/create-new-resource#copy-the-instrumentation-key "Copy the instrumentation key")
 
 El resultado debería ser algo similar a la siguiente imágen:
 
