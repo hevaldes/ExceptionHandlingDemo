@@ -198,7 +198,7 @@ Nota: El método RegistraExcepcion registra el error en _Application Insights_ s
 
 9. Resuelva la dependencia de la línea donde está el objeto _TelemetryClient_
 
-![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/TelemetryClient.png "Visual Studio Solution")
+![Image](https://github.com/hevaldes/PolicyExceptionHandling/blob/master/assets/TelemetryClientError.png "Visual Studio Solution")
 
 10. Agregue la siguiente referencia al inicio de su archivo _Telemetria.cs_
 
