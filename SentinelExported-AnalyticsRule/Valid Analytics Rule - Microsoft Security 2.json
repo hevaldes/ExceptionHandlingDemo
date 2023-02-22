@@ -1,0 +1,28 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "workspace": {
+      "type": "String"
+    }
+  },
+  "resources": [
+    {
+      "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/7c192267-ac8a-4182-9336-f5e7647fe9e5')]",
+      "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/7c192267-ac8a-4182-9336-f5e7647fe9e5')]",
+      "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+      "kind": "MicrosoftSecurityIncidentCreation",
+      "apiVersion": "2022-09-01-preview",
+      "properties": {
+        "productFilter": "Microsoft 365 Insider Risk Management",
+        "severitiesFilter": null,
+        "displayNamesFilter": null,
+        "displayNamesExcludeFilter": null,
+        "displayName": "Valid Analytics Rule - Microsoft Security 2",
+        "enabled": true,
+        "description": "Create incidents based on all alerts generated in Microsoft 365 Insider Risk Management",
+        "alertRuleTemplateName": null
+      }
+    }
+  ]
+}

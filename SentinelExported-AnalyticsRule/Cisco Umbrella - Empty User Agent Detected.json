@@ -1,0 +1,52 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "workspace": {
+      "type": "String"
+    }
+  },
+  "resources": [
+    {
+      "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/06f30554-e3fe-43f4-b963-5ff719ee404d')]",
+      "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/06f30554-e3fe-43f4-b963-5ff719ee404d')]",
+      "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+      "kind": "Scheduled",
+      "apiVersion": "2022-09-01-preview",
+      "properties": {
+        "queryFrequency": "PT15M",
+        "queryPeriod": "PT15M",
+        "triggerOperator": "GreaterThan",
+        "triggerThreshold": 0,
+        "eventGroupingSettings": {
+          "aggregationKind": "SingleAlert"
+        },
+        "severity": "Medium",
+        "query": "CommonSecurityLog",
+        "suppressionDuration": "PT1H",
+        "suppressionEnabled": false,
+        "incidentConfiguration": {
+          "createIncident": true,
+          "groupingConfiguration": {
+            "enabled": false,
+            "reopenClosedIncident": false,
+            "lookbackDuration": "PT5H",
+            "matchingMethod": "AllEntities",
+            "groupByEntities": [],
+            "groupByAlertDetails": [],
+            "groupByCustomDetails": []
+          }
+        },
+        "templateVersion": "1.1.0",
+        "tactics": [
+          "CommandAndControl"
+        ],
+        "techniques": [],
+        "displayName": "Cisco Umbrella - Empty User Agent Detected",
+        "enabled": false,
+        "description": "Rule helps to detect empty and unusual user agent indicating web browsing activity by an unusual process other than a web browser.",
+        "alertRuleTemplateName": "2b328487-162d-4034-b472-59f1d53684a1"
+      }
+    }
+  ]
+}
